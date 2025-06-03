@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Controle de Produção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            transition: background-color 0.5s;
+        }
+
+        .header {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .clock {
+            font-size: 1.1rem;
+        }
+
+        .toast-container {
+            z-index: 2000;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- 🔹 Cabeçalho -->
+    <header class="header py-3 px-4 d-flex justify-content-between align-items-center shadow">
+        <div class="d-flex align-items-center gap-3">
+            <img src="" alt="Logo" width="40">
+            <h4 class="mb-0 fw-bold">Controle de Corte</h4>
+        </div>
+        <div class="clock fw-semibold" id="relogio"></div>
+    </header>
+
+    <div class="container-fluid min-vh-100 py-4">
+
+        <!-- 🔸 Título e contador -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="fw-bold">Corte</h1>
+        </div>
+
+        <!-- 🔸 Botões principais -->
+        <div class="row mb-4 g-3">
+            <div class="col-6">
+                <button id="btnProducao" type="button" class="btn btn-primary btn-lg w-100 py-5 fs-1">
+                    Produção
+                </button>
+            </div>
+            <div class="col-6">
+                <button id="btnquebra" type="button" class="btn btn-danger btn-lg w-100 py-5 fs-1">
+                    Perda
+                </button>
+            </div>
+        </div>
+
+        <h2 class="mb-4">Produção Diária</h2>
+
+        <!-- 🔹 Card formulário -->
+        <div id="formContainer" class="card shadow-sm p-4 bg-light">
+            <div class="row g-3">
+
+                <!-- Campos de seleção -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Turno</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Turno 01</option>
+                        <option>Turno 02</option>
+                        <option>Turno 03</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Máquina</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Mesa 01</option>
+                        <option>Mesa 02</option>
+                        <option>Mesa 03</option>
+                        <option>Mesa 04</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Operador</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Ivan</option>
+                        <option>Claudio</option>
+                        <option>Rosenval</option>
+                        <option>Alessandro</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Cliente</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Atoli</option>
+                        <option>Danglass</option>
+                        <option>Guardian</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Tipo de Vidro</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Cristal</option>
+                        <option>Espelho</option>
+                        <option>Laminado</option>
+                    </select>
+                </div>
+
+                <!-- Campos numéricos -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Espessura (mm)</label>
+                    <input type="number" class="form-control campo teclado-numerico" placeholder="Ex.: 8">
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Altura (mm)</label>
+                    <input type="number" class="form-control campo teclado-numerico" placeholder="Ex.: 2000">
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Largura (mm)</label>
+                    <input type="number" class="form-control campo teclado-numerico" placeholder="Ex.: 1500">
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-control campo teclado-numerico" placeholder="Ex.: 10">
+                </div>
+
+                <!-- Motivo da Perda -->
+                <div class="col-12 col-md-6" id="slcextra" style="display: none;">
+                    <label class="form-label">Motivo da Perda</label>
+                    <select class="form-select campo">
+                        <option selected disabled>Selecione</option>
+                        <option>Dimensional</option>
+                        <option>Lasca</option>
+                        <option>Risco</option>
+                        <option>Trinca</option>
+                        <option>Matéria-prima</option>
+                        <option>Bolha</option>
+                        <option>Outros...</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔸 Botão salvar -->
+    <div class="fixed-bottom p-3 bg-white shadow-sm">
+        <button id="btnSalvar" class="btn btn-success btn-lg w-100" disabled>Salvar</button>
+    </div>
+
+    <!-- 🔔 Toast -->
+    <div class="position-fixed bottom-0 end-0 p-3 toast-container">
+        <div id="toastMsg" class="toast align-items-center text-bg-primary border-0">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Mensagem aqui.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔢 Modal teclado numérico -->
+    <div class="modal fade" id="tecladoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header">
+                    <h5 class="modal-title">Digite o valor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="visor" class="form-control mb-4 fs-2 fw-bold text-center bg-light">0</div>
+
+                    <div class="d-grid gap-3">
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('1')">1</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('2')">2</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('3')">3</button>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('4')">4</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('5')">5</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('6')">6</button>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('7')">7</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('8')">8</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('9')">9</button>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-danger flex-fill fs-3 rounded-3" onclick="limpar()">C</button>
+                            <button class="btn btn-secondary flex-fill fs-3 rounded-3" onclick="digitar('0')">0</button>
+                            <button class="btn btn-success flex-fill fs-3 rounded-3" onclick="confirmar()">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ⏰ Relógio
+        setInterval(() => {
+            const agora = new Date();
+            document.getElementById('relogio').innerText = agora.toLocaleString();
+        }, 1000);
+
+        let contadorProducao = 0;
+
+        function mostrarToast(mensagem, cor = 'primary') {
+            const toast = document.getElementById('toastMsg');
+            toast.className = `toast align-items-center text-bg-${cor} border-0`;
+            toast.querySelector('.toast-body').innerText = mensagem;
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        function mudarFundo(cor) {
+            const container = document.getElementById('formContainer');
+            container.classList.remove('bg-info', 'bg-warning', 'bg-light');
+            container.classList.add(cor);
+        }
+
+        function limparCampos() {
+            document.querySelectorAll('.campo').forEach(campo => campo.value = '');
+        }
+
+        function verificarCamposPreenchidos() {
+            const campos = document.querySelectorAll('.campo');
+            let todosPreenchidos = true;
+            campos.forEach(campo => {
+                if (campo.offsetParent !== null && campo.value.trim() === '') {
+                    todosPreenchidos = false;
+                }
+            });
+            document.getElementById('btnSalvar').disabled = !todosPreenchidos;
+        }
+
+        function gerarExcel() {
+            const campos = document.querySelectorAll('.campo');
+            const data = new Date().toLocaleString();
+
+            const dados = [];
+            campos.forEach(campo => {
+                dados.push(campo.value.trim().replace(/;/g, ','));
+            });
+
+            const tipo = document.getElementById('slcextra').style.display === 'none' ? 'Producao' : 'Perda';
+
+            const linha = `${data};${dados.join(';')};${tipo}\n`;
+
+            const cabecalho = 'Data e Hora;Turno;Máquina;Operador;Cliente;Tipo de Vidro;Espessura;Altura;Largura;Quantidade;Motivo da Perda;Tipo\n';
+
+            const conteudo = cabecalho + linha;
+
+            const blob = new Blob(["\ufeff", conteudo], {
+                type: "application/vnd.ms-excel"
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `registro-${tipo}-${new Date().toLocaleDateString().replace(/\//g, '-')}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        document.querySelectorAll('.campo').forEach(campo => {
+            campo.addEventListener('input', verificarCamposPreenchidos);
+        });
+
+        document.getElementById('btnProducao').addEventListener('click', function () {
+            mudarFundo('bg-info');
+            document.getElementById('slcextra').style.display = 'none';
+            limparCampos();
+            verificarCamposPreenchidos();
+        });
+
+        document.getElementById('btnquebra').addEventListener('click', function () {
+            mudarFundo('bg-warning');
+            document.getElementById('slcextra').style.display = 'block';
+            limparCampos();
+            verificarCamposPreenchidos();
+        });
+
+        document.getElementById('btnSalvar').addEventListener('click', function () {
+            contadorProducao++;
+            document.getElementById('contadorProducao').innerText = contadorProducao;
+            mostrarToast('Registro salvo com sucesso!', 'success');
+            gerarExcel();
+            limparCampos();
+            verificarCamposPreenchidos();
+        });
+
+        // Teclado Numérico Modal
+        let inputAtual = null;
+        let valorAtual = '';
+
+        document.querySelectorAll('.teclado-numerico').forEach(input => {
+            input.addEventListener('click', function () {
+                inputAtual = this;
+                valorAtual = this.value || '';
+                document.getElementById('visor').innerText = valorAtual;
+                const modal = new bootstrap.Modal(document.getElementById('tecladoModal'));
+                modal.show();
+            });
+        });
+
+        function digitar(num) {
+            if (valorAtual.length < 5) {
+                valorAtual += num;
+                document.getElementById('visor').innerText = valorAtual;
+            }
+        }
+
+        function limpar() {
+            valorAtual = '';
+            document.getElementById('visor').innerText = '';
+        }
+
+        function confirmar() {
+            if (inputAtual) {
+                inputAtual.value = valorAtual;
+            }
+            const modal = bootstrap.Modal.getInstance(document.getElementById('tecladoModal'));
+            modal.hide();
+            verificarCamposPreenchidos();
+        }
+    </script>
+</body>
+
+</html>
